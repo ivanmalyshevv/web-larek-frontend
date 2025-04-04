@@ -184,74 +184,74 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
 
 ### 1. `EventEmitter`
 Брокер событий (реализует `IEvents`):
-- `on(event: string, callback: Function)` — подписка на событие
-- `emit(event: string, ...args: any[])` — генерация события
-- `trigger(event: string)` — возвращает функцию-триггер
+   - `on(event: string, callback: Function)` — подписка на событие
+   - `emit(event: string, ...args: any[])` — генерация события
+   - `trigger(event: string)` — возвращает функцию-триггер
 
 ### 2. `Api`
 Базовый класс для HTTP-запросов:
-- `get(endpoint: string)` — GET запрос
-- `post(endpoint: string, data: object, method = 'POST')` — POST/PUT запросы
+   - `get(endpoint: string)` — GET запрос
+   - `post(endpoint: string, data: object, method = 'POST')` — POST/PUT запросы
 
 ### 3. `Component<T>`
 Базовый компонент представления:
-- `toggleClass()`, `setText()`, `setDisabled()` — утилиты
-- `render(data: T)` — обновление представления
+   - `toggleClass()`, `setText()`, `setDisabled()` — утилиты
+   - `render(data: T)` — обновление представления
 
 ## Слой данных (Model)
 
 ### Класс `AppState`
 Хранит состояние приложения:
-- `catalog: IProductItem[]` — товары
-- `preview: string | null` — просматриваемый товар
-- `basket: IProductItem[]` — корзина
-- `order: IOrder | null` — заказ
-- `formErrors: ValidationErrors` — ошибки
+   - `catalog: IProductItem[]` — товары
+   - `preview: string | null` — просматриваемый товар
+   - `basket: IProductItem[]` — корзина
+   - `order: IOrder | null` — заказ
+   - `formErrors: ValidationErrors` — ошибки
 
 **Методы:**
-- Управление каталогом (`setCatalog`, `setPreview`)
-- Работа с корзиной (`add/deleteProduct`, `getBasketTotal`)
-- Оформление заказа (`setOrderField`, `validateOrder`)
-- Очистка данных (`clearBasket`, `clearOrder`)
+   - Управление каталогом (`setCatalog`, `setPreview`)
+   - Работа с корзиной (`add/deleteProduct`, `getBasketTotal`)
+   - Оформление заказа (`setOrderField`, `validateOrder`)
+   - Очистка данных (`clearBasket`, `clearOrder`)
 
 ## Слой представления (View)
 
 ### Основные компоненты
 1. **`Modal`** — базовое модальное окно:
-  - `open()`, `close()`
-  - Управление содержимым
+   - `open()`, `close()`
+   - Управление содержимым
 
 2. **`ProductCard` и производные:**
-  - `ProductCardCatalog` — карточка в каталоге
-  - `ProductCardPreview` — детальный просмотр
-  - `ProductCardBasket` — товар в корзине
+   - `ProductCardCatalog` — карточка в каталоге
+   - `ProductCardPreview` — детальный просмотр
+   - `ProductCardBasket` — товар в корзине
 
 3. **`Page`** — главная страница:
-  - Каталог, кнопка корзины, счетчик
+   - Каталог, кнопка корзины, счетчик
 
 4. **`Basket`** — корзина товаров:
-  - Список, сумма, оформление
+   - Список, сумма, оформление
 
 5. **`Success`** — подтверждение заказа
 
 6. **`Form` и производные:**
-  - `PaymentForm` — оплата и адрес
-  - `ContactsForm` — контактные данные
+   - `PaymentForm` — оплата и адрес
+   - `ContactsForm` — контактные данные
 
 ## Слой коммуникации
 
 ### Класс `ApiService`
 Наследует `Api`, реализует:
-  - Получение каталога товаров
-  - Отправка заказа
--   Формирование URL изображений
+   - Получение каталога товаров
+   - Отправка заказа
+   - Формирование URL изображений
 
 ## Взаимодействие компонентов
 
 **Ключевые события:**
-  - `products:changed` - обновление каталога
-  - `preview:changed` - просмотр товара
-  - `modal:open/close` - модальные окна
-  - `basket:changed` -  изменение корзины
-  - `product:select`, `basket:open` — действия
-  - `order:changed`, `formErrors:change` — формы
+   - `products:changed` - обновление каталога
+   - `preview:changed` - просмотр товара
+   - `modal:open/close` - модальные окна
+   - `basket:changed` -  изменение корзины
+   - `product:select`, `basket:open` — действия
+   - `order:changed`, `formErrors:change` — формы
