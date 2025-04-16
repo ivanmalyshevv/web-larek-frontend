@@ -112,8 +112,8 @@ interface OrderConfirmation {
 ### Интерфейс для модели данных карточек:
 
 ```
-export interface IProductData {
-	cards: IProduct[];
+interface IProductData {
+	cards: IProductItem[];
 	preview: string | null;
 }
 ```
@@ -218,25 +218,104 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
 
 ### Основные компоненты
 1. **`Modal`** — базовое модальное окно:
-   - `open()`, `close()`
-   - Управление содержимым
+      ***`Поля:`***
+         - `container: HTMLElement`- контейнер модального окна
+         - `closeButton: HTMLButtonElement` - кнопка закрытия
+         - `content: HTMLElement` - контейнер для контента
 
-2. **`ProductCard` и производные:**
-   - `ProductCardCatalog` — карточка в каталоге
-   - `ProductCardPreview` — детальный просмотр
-   - `ProductCardBasket` — товар в корзине
+      ***`Методы:`***
+         - `open()`- открытие модального окна
+         - `close()` - закрытие модального окна
+         - `render(content: HTMLElement)` - отображение контента
+
+      ***`Обработчики событий:`***
+         - `click` на `closeButton` - закрытие модального окна
+         - `click` вне контента - закрытие модального окна
+
+2. **`ProductCard`** - Базовый класс карточки товара
+      ***`Поля:`***
+         - `element: HTMLElement`- DOM-элемент карточки
+         - `button?: HTMLButtonElement` - кнопка действия (добавить/удалить)
+         - `title: HTMLElement` - заголовок товара
+         - `price: HTMLElement` - цена товара
+         - `image: HTMLImageElement` - изображение товара
+         - `category: HTMLElement` - категория товара
+
+      ***`Методы:`***
+         - `render(data: IProductItem)`- отображение данных товара
+
+      ***`Обработчики событий:`***
+         - `click` на карточке - выбор товара (для галереи)
+         - `click` на кнопке - действие с товаром (добавить/удалить)
 
 3. **`Page`** — главная страница:
-   - Каталог, кнопка корзины, счетчик
+      ***`Поля:`***
+         - `gallery: HTMLElement`- контейнер галереи товаров
+         - `basketButton: HTMLButtonElement` - кнопка корзины
+         - `counter: HTMLElement` - счетчик товаров в корзине
+
+      ***`Методы:`***
+         - `renderCatalog(items: IProductItem[])`- отображение каталога товаров
+
+      ***`Обработчики событий:`***
+         - `click` на `basketButton` - открытие корзины
 
 4. **`Basket`** — корзина товаров:
-   - Список, сумма, оформление
+      ***`Поля:`***
+         - `list: HTMLUListElement`- список товаров
+         - `totalPrice: HTMLSpanElement` - общая стоимость
+         - `orderButton: HTMLButtonElement` - кнопка оформления заказа
 
-5. **`Success`** — подтверждение заказа
+      ***`Методы:`***
+         - `render(items: BasketItem[])`- отображение списка товаров
+         - `updateTotal(price: number)`- обновление общей стоимости
 
-6. **`Form` и производные:**
-   - `PaymentForm` — оплата и адрес
-   - `ContactsForm` — контактные данные
+      ***`Обработчики событий:`***
+         - `click` на `orderButton` - переход к оформлению заказа
+         - `click` на кнопках удаления товара - удаление товара из корзины
+
+5. **`Success`** — успешный заказ
+      ***`Поля:`***
+         - `closeButton: HTMLButtonElement`- кнопка закрытия
+         - `title: HTMLElement` - заголовок
+         - `description: HTMLElement` - описание заказа
+
+      ***`Методы:`***
+         - `render(data: OrderConfirmation)`- отображение данных заказа
+
+      ***`Обработчики событий:`***
+         - `click` на `closeButton` - закрытие окна
+
+6. **`OrderForm`** - Форма заказа
+   ***`Поля:`***
+         - `form: HTMLFormElement`- форма заказа
+         - `paymentButtons: HTMLButtonElement[]` - кнопки выбора оплаты
+         - `addressInput: HTMLInputElement` - поле адреса
+         - `submitButton: HTMLButtonElement` - кнопка отправки
+
+      ***`Методы:`***
+         - `render(data: OrderPayment)`- отображение формы
+         - `setErrors(errors: ValidationErrors)`- отображение ошибок
+
+      ***`Обработчики событий:`***
+         - `click` на `paymentButtons` - выбор способа оплаты
+         - `input` на `addressInput` - ввод адреса
+         - `submit` формы - отправка данных
+
+7. **`ContacntsForm`** -  форма контактов 
+      ***`Поля:`***
+         - `form: HTMLFormElement`- форма контактов
+         - `emailInput: HTMLInputElement` - поле email
+         - `phoneInput: HTMLInputElement` -  поле телефона
+         - `submitButton: HTMLButtonElement` -  кнопка отправки
+
+      ***`Методы:`***
+         - `render(data: Contacts)`- отображение формы
+         - `setErrors(errors: ValidationErrors)`- отображение ошибок
+
+      ***`Обработчики событий:`***
+         - `input` на полях формы - ввод данных
+         - `submit` формы - отправка данных
 
 ## Слой коммуникации
 
@@ -251,7 +330,8 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
 **Ключевые события:**
    - `products:changed` - обновление каталога
    - `preview:changed` - просмотр товара
-   - `modal:open/close` - модальные окна
+   - `modal:open/close` - открытие/закрытие модального окна
    - `basket:changed` -  изменение корзины
    - `product:select`, `basket:open` — действия
-   - `order:changed`, `formErrors:change` — формы
+   - `order:changed` — изменение данных заказа
+   - `formErrors:changed` — изменение ошибок валидации
