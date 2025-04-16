@@ -218,6 +218,7 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
 
 ### Основные компоненты
 1. **`Modal`** — базовое модальное окно:
+
       ***`Поля:`***
          - `container: HTMLElement`- контейнер модального окна
          - `closeButton: HTMLButtonElement` - кнопка закрытия
@@ -233,6 +234,7 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
          - `click` вне контента - закрытие модального окна
 
 2. **`ProductCard`** - Базовый класс карточки товара
+
       ***`Поля:`***
          - `element: HTMLElement`- DOM-элемент карточки
          - `button?: HTMLButtonElement` - кнопка действия (добавить/удалить)
@@ -249,6 +251,7 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
          - `click` на кнопке - действие с товаром (добавить/удалить)
 
 3. **`Page`** — главная страница:
+
       ***`Поля:`***
          - `gallery: HTMLElement`- контейнер галереи товаров
          - `basketButton: HTMLButtonElement` - кнопка корзины
@@ -261,6 +264,7 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
          - `click` на `basketButton` - открытие корзины
 
 4. **`Basket`** — корзина товаров:
+
       ***`Поля:`***
          - `list: HTMLUListElement`- список товаров
          - `totalPrice: HTMLSpanElement` - общая стоимость
@@ -275,6 +279,7 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
          - `click` на кнопках удаления товара - удаление товара из корзины
 
 5. **`Success`** — успешный заказ
+
       ***`Поля:`***
          - `closeButton: HTMLButtonElement`- кнопка закрытия
          - `title: HTMLElement` - заголовок
@@ -287,6 +292,7 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
          - `click` на `closeButton` - закрытие окна
 
 6. **`OrderForm`** - Форма заказа
+
    ***`Поля:`***
          - `form: HTMLFormElement`- форма заказа
          - `paymentButtons: HTMLButtonElement[]` - кнопки выбора оплаты
@@ -303,6 +309,7 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
          - `submit` формы - отправка данных
 
 7. **`ContacntsForm`** -  форма контактов 
+
       ***`Поля:`***
          - `form: HTMLFormElement`- форма контактов
          - `emailInput: HTMLInputElement` - поле email
