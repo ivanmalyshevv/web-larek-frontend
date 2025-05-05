@@ -83,11 +83,12 @@ yarn build
 ```
 interface IProductItem {
   id: string;
-  name: string;
-  price: number;
+  image: string;
+  title: string;
   description: string;
   category: string;
-  image: string;
+  price: number | null;
+  button: string;
 }
 ```
 
@@ -103,9 +104,9 @@ interface IOrder {
 ```
 ### Потверждение заказа:
 ```
-interface OrderConfirmation {
-  id: string;
+export interface OrderConfirmation extends IOrder {
   total: number;
+  items: string[];
 }
 ```
 
@@ -113,16 +114,16 @@ interface OrderConfirmation {
 
 ```
 interface IProductData {
-	cards: IProductItem[];
-	preview: string | null;
+  total: number;
+  items: IProductItem[];
 }
 ```
 
-### Тип карточки на главной странице:
+### Тип элемента каталога:
 
 
 ```
-type CatalogItem = Omit<ProductItem, 'description'>;
+type ICatalogItem = Omit<IProductItem, 'description'>;
 
 ```
 
@@ -130,24 +131,43 @@ type CatalogItem = Omit<ProductItem, 'description'>;
 
 
 ```
-type BasketItem = Pick<IProductItem, 'id' | 'name' | 'price'>;
+type IBasketProduct = Pick<IProductItem, 'id' | 'title' | 'price'>;
 
 ```
 
-### Тип данные в корзине:
+### Тип карточки в корзине:
 
 
 ```
-type BasketItem {
-  id: string;
-  title: string;
-  price: number | null;
+type IProductCategory = { [key: string]: string };
+
+```
+
+### Тип корзины:
+
+
+```
+type IBasketItem {
+  items: IBasketItem[];
+  total: number | null;
 }
 
 
 ```
 
-### Типы варианты оплаты:
+### Интерфейс результата заказа:
+
+
+```
+interface OrderDataResult {
+  id: string;
+  total: number;
+}
+
+
+```
+
+### Тип способа оплаты:
 
 
 ```
@@ -155,7 +175,7 @@ type Payment = 'card' | 'cash' | '';
 
 ```
 
-### Тип данных для формы оплаты и адреса:
+###  Тип данных для оплаты:
 
 
 ```
@@ -163,7 +183,7 @@ type OrderPayment = Pick<IOrder, 'payment' | 'address'>;
 
 ```
 
-### Тип данных для контактной информации:
+### Тип контактных данных:
 
 
 ```
@@ -171,15 +191,13 @@ type Contacts = Pick<IOrder, 'email' | 'phone'>;
 
 ```
 
-### Тип ошибок валидации форм:
+### Тип ошибок валидации:
 
 
 ```
 type ValidationErrors = Partial<Record<keyof IOrder, string>>;
 
 ```
-
-
 ## Базовые классы
 
 ### 1. `EventEmitter`
@@ -209,10 +227,21 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
    - `formErrors: ValidationErrors` — ошибки
 
 **Методы:**
-   - Управление каталогом (`setCatalog`, `setPreview`)
-   - Работа с корзиной (`add/deleteProduct`, `getBasketTotal`)
-   - Оформление заказа (`setOrderField`, `validateOrder`)
-   - Очистка данных (`clearBasket`, `clearOrder`)
+   - Устанавливает каталог и генерирует событие (`setCatalog(items)`)
+   - Устанавливает предпросмотр (`setPreview(item)`)
+   - Возвращает товар по ID. (`getProduct(id)`)
+   - Добавляет товар в корзину (`addProductToBasket(item)`)
+   - Удаляет товар из корзины (`deleteProductFromBasket(item)`)
+   - Проверяет наличие товара в корзине (`isAddedToBusket(item)`)
+   - Возвращает текст кнопки "Купить" или "Удалить". (`getButtonText(item)`)
+   - Возвращает количество товаров в корзине (`getBasketTotal()`)
+   - Возвращает индекс товара в корзине (`getProductIndex(item)`)
+   - Обновляет поле заказа (`setOrderField(field, value)`)
+   - Устанавливает способ оплаты (`setOrderPayment(value)`)
+   - Возвращает данные заказа (`getOrderData()`)
+   - Валидирует форму заказа (`validateOrder()`)
+   - Очищает корзину (`clearBasket()`)
+   - Очищает данные заказа (`clearOrder()`)
 
 ## Слой представления (View)
 
@@ -227,38 +256,49 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
       ***`Методы:`***
          - `open()`- открытие модального окна
          - `close()` - закрытие модального окна
-         - `render(content: HTMLElement)` - отображение контента
+         - `render(data)` - отрисовывает и открывает модальное окно
 
       ***`Обработчики событий:`***
          - `click` на `closeButton` - закрытие модального окна
          - `click` вне контента - закрытие модального окна
 
 2. **`ProductCard`** - Базовый класс карточки товара
+   **`ProductCardCatalog`** - Карточка товара в каталоге.
+   **`ProductCardPreview`** - Подробное описание товара.
+   **`ProductCardBasket`** - товар в корзине с возможностью удаления.
 
       ***`Поля:`***
          - `element: HTMLElement`- DOM-элемент карточки
-         - `button?: HTMLButtonElement` - кнопка действия (добавить/удалить)
+         - `button: HTMLButtonElement` - кнопка действия (добавить/удалить)
          - `title: HTMLElement` - заголовок товара
          - `price: HTMLElement` - цена товара
          - `image: HTMLImageElement` - изображение товара
          - `category: HTMLElement` - категория товара
+         - `description: HTMLElement` - описание товара
 
       ***`Методы:`***
-         - `render(data: IProductItem)`- отображение данных товара
+         - `set title(value)`- Устанавливает название товара
+         - `set price(value)`- Устанавливает цену товара
+         - `set image(value)`- Устанавливает изображение товара
+         - `set category(value)`- Устанавливает категорию товара
+         - `set description(value)`- Устанавливает описание товара
+         - `set button(value)`- Устанавливает текст кнопки.
 
       ***`Обработчики событий:`***
          - `click` на карточке - выбор товара (для галереи)
          - `click` на кнопке - действие с товаром (добавить/удалить)
-
+         - `click` на кнопке удаления (deleteButton) - удаление товара из корзины (вызов метода класса карточки)
 3. **`Page`** — главная страница:
 
       ***`Поля:`***
          - `gallery: HTMLElement`- контейнер галереи товаров
          - `basketButton: HTMLButtonElement` - кнопка корзины
-         - `counter: HTMLElement` - счетчик товаров в корзине
+         - `basketCounter: HTMLElement` - счетчик товаров в корзине
 
       ***`Методы:`***
-         - `renderCatalog(items: IProductItem[])`- отображение каталога товаров
+         - `set catalog(items)`- Устанавливает список товаров в галерее
+         - `set counter(value)`- Устанавливает счетчик товаров в корзине
+         - `set locked(value)`- Блокирует/разблокирует интерфейс
 
       ***`Обработчики событий:`***
          - `click` на `basketButton` - открытие корзины
@@ -267,26 +307,25 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
 
       ***`Поля:`***
          - `list: HTMLUListElement`- список товаров
-         - `totalPrice: HTMLSpanElement` - общая стоимость
-         - `orderButton: HTMLButtonElement` - кнопка оформления заказа
+         - `total: HTMLSpanElement` - общая стоимость
+         - `button: HTMLButtonElement` - кнопка оформления заказа
 
       ***`Методы:`***
-         - `render(items: BasketItem[])`- отображение списка товаров
-         - `updateTotal(price: number)`- обновление общей стоимости
+         - `set items(items)`- Устанавливает элементы корзины
+         - `set total(total)`- Устанавливает общую сумму
+         - `set selected(count)`- Блокирует кнопку, если нет товаров
 
       ***`Обработчики событий:`***
-         - `click` на `orderButton` - переход к оформлению заказа
-         - `click` на кнопках удаления товара - удаление товара из корзины
+         - `click` на `HTMLButtonElement` - переход к оформлению заказа
 
 5. **`Success`** — успешный заказ
 
       ***`Поля:`***
          - `closeButton: HTMLButtonElement`- кнопка закрытия
-         - `title: HTMLElement` - заголовок
          - `description: HTMLElement` - описание заказа
 
       ***`Методы:`***
-         - `render(data: OrderConfirmation)`- отображение данных заказа
+         - `set total(value)`- установка суммы заказа
 
       ***`Обработчики событий:`***
          - `click` на `closeButton` - закрытие окна
@@ -294,19 +333,18 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
 6. **`OrderForm`** - Форма заказа
 
    ***`Поля:`***
-         - `form: HTMLFormElement`- форма заказа
-         - `paymentButtons: HTMLButtonElement[]` - кнопки выбора оплаты
-         - `addressInput: HTMLInputElement` - поле адреса
-         - `submitButton: HTMLButtonElement` - кнопка отправки
+         - `cashButton: HTMLButtonElement[]` - кнопки выбора оплаты
+         - `address: HTMLInputElement` - поле адреса
+         - ` cardButton: HTMLButtonElement` - кнопки выбора оплаты
 
       ***`Методы:`***
-         - `render(data: OrderPayment)`- отображение формы
-         - `setErrors(errors: ValidationErrors)`- отображение ошибок
+         - `togglePayment(value)`- переключает активный стиль кнопок
+         - `clearPayment()`- сбрасывает выбор способа оплаты
 
       ***`Обработчики событий:`***
-         - `click` на `paymentButtons` - выбор способа оплаты
-         - `input` на `addressInput` - ввод адреса
-         - `submit` формы - отправка данных
+         - `click` на `_cardButton` - выбор способа оплаты
+         - `input` на `_address` - ввод адреса
+         - `click` на `_cashButton` - выбор способа оплаты
 
 7. **`ContacntsForm`** -  форма контактов 
 
@@ -324,6 +362,23 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
          - `input` на полях формы - ввод данных
          - `submit` формы - отправка данных
 
+ 8. **`Form`** -  отображение общих элементов форм заказа
+
+      ***`Поля:`***
+         - `form: HTMLFormElement`- форма контактов
+         - `emailInput: HTMLInputElement` - поле email
+         - `phoneInput: HTMLInputElement` -  поле телефона
+         - `submitButton: HTMLButtonElement` -  кнопка отправки
+
+      ***`Методы:`***
+         - `onInputChange(field: keyof T, value: string)`- Обработчик изменения поля
+         - `valid = boolean`- установка доступности кнопки отправки
+         - `errors = string`- установка текста ошибок
+
+      ***`Обработчики событий:`***
+         - `input` на полях формы - ввод данных
+         - `submit` формы - отправка данных        
+
 ## Слой коммуникации
 
 ### Класс `ApiService`
@@ -336,9 +391,16 @@ type ValidationErrors = Partial<Record<keyof IOrder, string>>;
 
 **Ключевые события:**
    - `products:changed` - обновление каталога
+   - `catalog:select` - выбор товара в каталоге
    - `preview:changed` - просмотр товара
    - `modal:open/close` - открытие/закрытие модального окна
    - `basket:changed` -  изменение корзины
    - `product:select`, `basket:open` — действия
-   - `order:changed` — изменение данных заказа
-   - `formErrors:changed` — изменение ошибок валидации
+   - `order:open` — открытие формы заказа
+   - `button:status` —  изменение статуса кнопки (добавить/удалить)
+   - `basket:open` — открытие корзины
+   - `basket:delete` — удаление товара из корзины
+   - `input:change` — изменение полей формы
+   - `order:submit` — отправка формы заказа
+   - `contacts:submit` — отправка контактных данных
+   - `order:finished` — завершение заказа
