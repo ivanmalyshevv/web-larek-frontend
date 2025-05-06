@@ -73,6 +73,10 @@ export class ProductCard<T> extends Component<IProductItem> {
 		}
 	}
 
+    get category() {
+        return this._category?.textContent || '';
+    }
+
 	set price(value: string) {
 		if (value) {
 			this.setText(this._price, `${value} синапсов`);
