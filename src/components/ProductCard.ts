@@ -63,12 +63,14 @@ export class ProductCard<T> extends Component<IProductItem> {
 	set category(value: string) {
 		this.setText(this._category, value);
 		if (this._category) {
-			this.toggleClass(this._category, productCategory[value], true);
+			Object.values(productCategory).forEach((className) => {
+				this._category.classList.remove(className);
+			});
+			const categoryClass = productCategory[value];
+			if (categoryClass) {
+				this._category.classList.add(categoryClass);
+			}
 		}
-	}
-
-	get category() {
-		return this._category.textContent || '';
 	}
 
 	set price(value: string) {
